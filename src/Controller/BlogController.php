@@ -45,13 +45,28 @@ class BlogController extends AbstractController
     $article = new Article();
 
     $form = $this->createFormBuilder($article)
-                ->add('title')
-                ->add('content')
-                ->add('image')
-                 -> getForm();
+    ->add('title')
+    ->add('content')
+    ->add('image')
+    -> getForm();
+//manipule les données
+    $form ->handleRequest($request);
+//Soumission form
+    if($form->isSubmitted()&& $form->isValid()){
+      //rajout de la date de création qui n'était pas dans le form
+      $article->setCreatedAt(new \DateTime());
+
+      $manager->persist($article);
+
+      $manager->flush();
+// redirection sur la page blog_show
+      return $this->redirectToRoute('blog_show', ['id'=> $article->getId()
+    ]);
+    }
+
 
     return $this->render('blog/create.html.twig', [
-        'formArticle' => $form->createView()
+      'formArticle' => $form->createView()
     ]);
   }
 
