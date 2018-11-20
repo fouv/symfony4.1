@@ -40,44 +40,57 @@ class BlogController extends AbstractController
 
   /**
   *  @Route("/blog/new", name="blog_create")
+  *  @Route("/blog/{id}/edit", name="blog_edit")
   */
-  public function create (Request $request, ObjectManager $manager) {
-    $article = new Article();
+  public function form (Article $article = null, Request $request, ObjectManager $manager) {
+    if(!$article) {
+      $article = new Article();
+    }
+
+
+    /**pré remplissage formulaire
+    $article->setTitle("Titre d'exemple")
+    ->setContent("Le contenu de l'article");
+    */
 
     $form = $this->createFormBuilder($article)
     ->add('title')
     ->add('content')
     ->add('image')
     -> getForm();
-//manipule les données
+    //manipule les données
     $form ->handleRequest($request);
-//Soumission form
+    //Soumission form
     if($form->isSubmitted()&& $form->isValid()){
-      //rajout de la date de création qui n'était pas dans le form
-      $article->setCreatedAt(new \DateTime());
+      //si l'article n'a pas d'id donc est un nouvel article, création de la date
+      if(!$article->getId()){
+        //rajout de la date de création qui n'était pas dans le form
+        $article->setCreatedAt(new \DateTime());
+      }
 
       $manager->persist($article);
 
       $manager->flush();
-// redirection sur la page blog_show
+      // redirection sur la page blog_show
       return $this->redirectToRoute('blog_show', ['id'=> $article->getId()
     ]);
-    }
-
-
-    return $this->render('blog/create.html.twig', [
-      'formArticle' => $form->createView()
-    ]);
   }
 
-  /**
-  * @Route("/blog/{id}", name="blog_show")
-  */
-  public function show(Article $article){
+//editmode le bouton va changer dans le formulaire suivant si edition ou création
+  return $this->render('blog/create.html.twig', [
+    'formArticle' => $form->createView(),
+    'editMode' => $article->getId() !== null
+  ]);
+}
 
-    return $this->render('blog/show.html.twig', [
-      'article' => $article
-    ]);
-  }
+/**
+* @Route("/blog/{id}", name="blog_show")
+*/
+public function show(Article $article){
+
+  return $this->render('blog/show.html.twig', [
+    'article' => $article
+  ]);
+}
 
 }
