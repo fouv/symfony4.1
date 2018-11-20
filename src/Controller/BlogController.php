@@ -7,6 +7,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Article;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form;
 use App\Repository\ArticleRepository;
@@ -44,25 +45,10 @@ class BlogController extends AbstractController
     $article = new Article();
 
     $form = $this->createFormBuilder($article)
-                ->add('title', TextType::class, [
-                  'attr' => [
-                      'placeholder' => "titre de l'article",
-                      'class' => 'form-control'
-                  ]
-                ])
-                ->add('content', TextType::class, [
-                  'attr' => [
-                      'placeholder' => "content",
-                      'class' => 'form-control'
-                  ]
-                ])
-                ->add('image', TextType::class, [
-                  'attr' => [
-                      'placeholder' => "image",
-                      'class' => 'form-control'
-                  ]
-                ])
-                ->getForm();
+                ->add('title')
+                ->add('content')
+                ->add('image')
+                 -> getForm();
 
     return $this->render('blog/create.html.twig', [
         'formArticle' => $form->createView()
